@@ -10,6 +10,8 @@ from rec_and_logs import RecAndLogsSection
 from new_registration import NewRegistrationSection
 from add_details import AddDetailsSection
 from add_cctv import AddCCTVSection
+from sidebar import Sidebar
+from homecontent import HomeContent
 
 class Homepage(tk.Frame):
     def __init__(self, master):
@@ -28,11 +30,8 @@ class Homepage(tk.Frame):
         self.sidebar_frame = tk.Frame(self, bg="#21252b", bd=2, relief=tk.SUNKEN)
         self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-        self.sidebar = tk.Frame(self.sidebar_frame, width=160, bg="#21252b")
+        self.sidebar = Sidebar(self, self.show_username, self.change_main_content)
         self.sidebar.pack(side=tk.LEFT, fill=tk.Y, expand=False)
-
-        self.display_username_change_password_fields()
-        self.create_sidebar_labels()
 
         tk.Frame(self.sidebar_frame, width=2, bg="#21252b").pack(side=tk.LEFT, fill=tk.Y)
 
@@ -48,46 +47,18 @@ class Homepage(tk.Frame):
         self.new_registration_section = NewRegistrationSection(self.main_content)
         self.add_details_section = AddDetailsSection(self.main_content)
 
-        self.current_section = None
+        self.home_content = HomeContent(self.main_content)
+        self.current_section = None  # Initialize current_section to None
 
-    def create_sidebar_labels(self):
-        logo_paths = {
-            "Home": "images/icons/cil-home.png",
-            "New Registration": "images/icons/icons8-add-administrator-18.png",
-            "Add CCTV": "images/icons/icons8-add-camera-18.png",
-            "Add Details": "images/icons/icons8-registration-18.png",
-            "REC & LOGS": "images/icons/icons8-recording-18.png",
-        }
-
-        for item, logo_path in logo_paths.items():
-            logo_image = self.load_and_resize_image(logo_path, width=20, height=20, resampling=Image.LANCZOS)
-            label = tk.Label(
-                self.sidebar,
-                text=item,
-                image=logo_image,
-                compound="left",
-                font=('Century Gothic', 12),
-                bg="#21252b",
-                fg="white",
-                padx=10,
-                pady=20,
-                anchor="w",
-            )
-            label.image = logo_image
-            label.bind("<Button-1>", lambda event, item=item: self.change_main_content(item))
-            label.pack(side=tk.TOP, fill=tk.X)
-
-    def display_username_change_password_fields(self):
-        self.username_label = tk.Label(self.navbar, text="Username: ", font=('Century Gothic', 12), bg="#232831", fg="white")
-        self.username_label.pack(side=tk.LEFT, expand=True)
+        self.show_section(self.home_content)  # Show home_content by default
 
     def show_username(self):
         self.cursor.execute(f"SELECT email FROM users WHERE email = '{self.logged_in_email}'")
         result = self.cursor.fetchone()
         if result:
-            self.username_label.config(text=f"Username: {result[0]}")
+            self.sidebar.show_username(result[0])
         else:
-            self.username_label.config(text="Username not found")
+            self.sidebar.show_username("Username not found")
 
     def open_change_password_window(self):
         ChangePasswordWindow(self, self.change_password)
@@ -130,6 +101,8 @@ class Homepage(tk.Frame):
             self.show_section(self.add_details_section)
         elif item == "Add CCTV":
             self.show_section(AddCCTVSection(self.main_content, self.conn, self.cursor))
+        elif item == "Home":
+            self.show_section(self.home_content)
         else:
             self.hide_current_section()
 
