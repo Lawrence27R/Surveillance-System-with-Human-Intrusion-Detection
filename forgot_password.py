@@ -8,13 +8,12 @@ class ForgotPasswordWindow(tk.Toplevel):
         self.login_window = login_window
         self.title("Forgot Password")
         self.geometry("600x400+400+200")
+        self.configure(bg="#232831")
 
         style = ThemedStyle(self)
         style.set_theme("arc")
 
-        self.configure(bg="#2E3B4E")
-
-        tk.Label(self, text="Enter your Username and Email", font=('Century Gothic', 16), bg="#2E3B4E", fg="white").place(relx=0.5, rely=0.1, anchor=tk.CENTER)
+        tk.Label(self, text="Enter your Username and Email", font=('Century Gothic', 16), bg="#232831", fg="white").place(relx=0.5, rely=0.1, anchor=tk.CENTER)
 
         self.username_entry = ttk.Entry(self, font=("Helvetica", 12), width=28)
         self.username_entry.place(relx=0.5, rely=0.3, anchor=tk.CENTER, height=30, bordermode="inside")
@@ -37,17 +36,16 @@ class ForgotPasswordWindow(tk.Toplevel):
     def on_entry_focus_in(self, event, entry, placeholder):
         if entry.get() == placeholder:
             entry.delete(0, tk.END)
-            entry["style"] = "TEntry"  # Apply the default style
+            entry["style"] = "TEntry"
 
     def on_entry_focus_out(self, event, entry, placeholder):
         if not entry.get():
             entry.insert(0, placeholder)
-            entry["style"] = "Placeholder.TEntry"  # Apply the placeholder style
+            entry["style"] = "Placeholder.TEntry"
 
     def send_password_reset(self):
         username = self.username_entry.get()
         email = self.email_entry.get()
-        # Add logic to send a password reset email (not implemented in this example)
         print(f"Send password reset for {username} to {email}")
         self.destroy()
         self.login_window.master.deiconify()

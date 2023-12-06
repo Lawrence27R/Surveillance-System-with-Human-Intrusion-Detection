@@ -1,16 +1,16 @@
 import mysql.connector
- 
+
 def initialize_connection():
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
         password="Demo@cc2024",
-        database="users" 
+        database="users"
     )
- 
+
     cursor = conn.cursor()
     create_table(cursor)
- 
+
     return conn, cursor
 
 def create_table(cursor):
@@ -36,13 +36,10 @@ def create_table_new(cursor):
     """)
 
 def login(cursor, data):
-
     cursor.execute(f"""SELECT * FROM users WHERE email = '{data["email"]}' 
                        AND password = '{data["password"]}' """)
-     
-    if cursor.fetchone() is not None:
-        return True
-    return False
+
+    return cursor.fetchone() is not None
 
 conn, cursor = initialize_connection()
 

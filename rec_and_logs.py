@@ -1,4 +1,3 @@
-# rec_and_logs.py
 import tkinter as tk
 from PIL import Image, ImageTk
 import os
@@ -6,11 +5,8 @@ import os
 class RecAndLogsSection(tk.Frame):
     def __init__(self, master):
         super().__init__(master, bg="#232831")
-        # Recording and Logs paths
         self.recording_path = "D:/Final Year"
         self.logs_path = "D:/My Project"
-
-        # Create and place two buttons with blue-colored rounded borders
         self.create_buttons()
 
     def create_buttons(self):
@@ -36,7 +32,6 @@ class RecAndLogsSection(tk.Frame):
         )
         button2.grid(row=0, column=1, padx=50)
 
-        # Center the buttons
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)

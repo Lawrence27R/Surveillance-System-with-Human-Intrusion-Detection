@@ -1,4 +1,3 @@
-# home.py
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from ttkthemes import ThemedStyle
@@ -9,67 +8,48 @@ from change_password import ChangePasswordWindow
 from navbar import NavigationBar
 from rec_and_logs import RecAndLogsSection
 from new_registration import NewRegistrationSection
-from add_details import AddDetailsSection  # Import the add details section
+from add_details import AddDetailsSection
 
 class Homepage(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master.title("Surveillance System with Human Intrusion Detection")
-        self.master.geometry("1400x720")
+        self.master.geometry("1400x720+0+0")  # Remove the position information
 
-        # Use ThemedStyle for a dark theme
         style = ThemedStyle(self.master)
         style.set_theme("arc")
 
-        self.configure(bg="#232831")  # Set background color for the main window
+        self.configure(bg="#232831")
 
-        # Create the navigation bar
         self.navbar = NavigationBar(self)
-        self.navbar.pack(side=tk.TOP, fill=tk.X)
+        self.navbar.pack(side=tk.TOP, fill=tk.X, padx=0,pady=0) 
 
-        # Create a frame to hold the sidebar and main content with a border in between
         self.sidebar_frame = tk.Frame(self, bg="#21252b", bd=2, relief=tk.SUNKEN)
-        self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)  # Adjust padx as needed
+        self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-        # Create the sidebar
         self.sidebar = tk.Frame(self.sidebar_frame, width=160, bg="#21252b")
         self.sidebar.pack(side=tk.LEFT, fill=tk.Y, expand=False)
 
-        # Display username and change password fields
         self.display_username_change_password_fields()
-
-        # Add labels with images for each item in the sidebar
         self.create_sidebar_labels()
 
-        # Create a border between the sidebar and the main content
         tk.Frame(self.sidebar_frame, width=2, bg="#21252b").pack(side=tk.LEFT, fill=tk.Y)
 
-        # Create the main content area
         self.main_content = tk.Frame(self, bg="#232831")
-        self.main_content.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)  # Adjust padx and pady as needed
+        self.main_content.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=0, pady=0)
 
+        self.pack(fill=tk.BOTH, expand=True)
 
-        self.pack(fill=tk.BOTH, expand=True)  # Pack to fill the entire window
-
-        # MySQL connection
         self.conn, self.cursor = mysql_db.initialize_connection()
-
-        # Store logged-in user's email
         self.logged_in_email = "rootuser@gmail.com"
 
-        # RecAndLogs section
         self.rec_and_logs_section = RecAndLogsSection(self.main_content)
-
-        # New Registration section
         self.new_registration_section = NewRegistrationSection(self.main_content)
-
-        # Add Details section
         self.add_details_section = AddDetailsSection(self.main_content)
 
         self.current_section = None
 
     def create_sidebar_labels(self):
-        # Replace these paths with actual image paths
         logo_paths = {
             "Home": "images/icons/cil-home.png",
             "New Registration": "images/icons/icons8-add-administrator-18.png",
@@ -79,10 +59,7 @@ class Homepage(tk.Frame):
         }
 
         for item, logo_path in logo_paths.items():
-            # Load and resize the image
             logo_image = self.load_and_resize_image(logo_path, width=20, height=20, resampling=Image.LANCZOS)
-
-            # Create a label with the logo image
             label = tk.Label(
                 self.sidebar,
                 text=item,
@@ -95,17 +72,13 @@ class Homepage(tk.Frame):
                 pady=20,
                 anchor="w",
             )
-            label.image = logo_image  # Keep a reference to the image
-
-            # Bind the label to a command that changes the main content
+            label.image = logo_image
             label.bind("<Button-1>", lambda event, item=item: self.change_main_content(item))
-
             label.pack(side=tk.TOP, fill=tk.X)
 
     def display_username_change_password_fields(self):
-        # Display username
         self.username_label = tk.Label(self.navbar, text="Username: ", font=('Century Gothic', 12), bg="#232831", fg="white")
-        self.username_label.pack(side=tk.LEFT, expand=True)  # Expand to fill the available space
+        self.username_label.pack(side=tk.LEFT, expand=True)
 
     def show_username(self):
         self.cursor.execute(f"SELECT email FROM users WHERE email = '{self.logged_in_email}'")
@@ -119,7 +92,7 @@ class Homepage(tk.Frame):
         ChangePasswordWindow(self, self.change_password)
 
     def change_password(self):
-        old_password = self.logged_in_email  # Replace this with the actual old password
+        old_password = self.logged_in_email
         new_password = ChangePasswordWindow.get_new_password()
         confirm_new_password = ChangePasswordWindow.get_confirm_new_password()
 
@@ -133,8 +106,6 @@ class Homepage(tk.Frame):
     def logout(self):
         result = messagebox.askyesno("Logout", "Are you sure you want to logout?")
         if result:
-            # Perform logout actions here
-            # For example, destroy the current window or switch to a login screen
             self.master.destroy()
 
     def load_and_resize_image(self, image_path, width=None, height=None, resampling=Image.LANCZOS):
@@ -150,7 +121,6 @@ class Homepage(tk.Frame):
             return None
 
     def change_main_content(self, item):
-
         if item == "REC & LOGS":
             self.show_section(self.rec_and_logs_section)
         elif item == "New Registration":
@@ -170,7 +140,6 @@ class Homepage(tk.Frame):
         if self.current_section:
             self.current_section.pack_forget()
             self.current_section = None
-
 
 if __name__ == "__main__":
     root = tk.Tk()
