@@ -9,12 +9,13 @@ from navbar import NavigationBar
 from rec_and_logs import RecAndLogsSection
 from new_registration import NewRegistrationSection
 from add_details import AddDetailsSection
+from add_cctv import AddCCTVSection
 
 class Homepage(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master.title("Surveillance System with Human Intrusion Detection")
-        self.master.geometry("1400x720+0+0")  # Remove the position information
+        self.master.geometry("1400x720+0+0")
 
         style = ThemedStyle(self.master)
         style.set_theme("arc")
@@ -22,7 +23,7 @@ class Homepage(tk.Frame):
         self.configure(bg="#232831")
 
         self.navbar = NavigationBar(self)
-        self.navbar.pack(side=tk.TOP, fill=tk.X, padx=0,pady=0) 
+        self.navbar.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0) 
 
         self.sidebar_frame = tk.Frame(self, bg="#21252b", bd=2, relief=tk.SUNKEN)
         self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
@@ -127,6 +128,8 @@ class Homepage(tk.Frame):
             self.show_section(self.new_registration_section)
         elif item == "Add Details":
             self.show_section(self.add_details_section)
+        elif item == "Add CCTV":
+            self.show_section(AddCCTVSection(self.main_content, self.conn, self.cursor))
         else:
             self.hide_current_section()
 
