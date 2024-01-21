@@ -11,7 +11,7 @@ def capture_images(user_id, username):
 
     # Load Haar Cascade classifiers for frontal and profile faces
     face_cascade_frontal = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    face_cascade_profile = cv2.CascadeClassifier('haarcascade_profileface.xml')  # Replace with the actual path
+    face_cascade_profile = cv2.CascadeClassifier('haarcascade_profileface.xml')  # Rep  lace with the actual path
 
     image_number = 1
 

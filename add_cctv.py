@@ -11,6 +11,7 @@ class AddCCTVSection(tk.Frame):
 
         self.create_cctv_form()
         self.create_cctv_table()
+        self.load_cctv_table()
 
     def create_cctv_form(self):
         form_frame = tk.Frame(self, bg="#232831")
@@ -67,12 +68,26 @@ class AddCCTVSection(tk.Frame):
         self.cctv_ip_entry.delete(0, tk.END)
 
     def load_cctv_table(self):
-        self.cctv_treeview.delete(*self.cctv_treeview.get_children())
-        self.cursor.execute("SELECT cctv_number, cctv_ip FROM cctv")
-        cctv_entries = self.cursor.fetchall()
+        try:
+            # Clear existing entries in the Treeview
+            self.cctv_treeview.delete(*self.cctv_treeview.get_children())
 
-        for entry in cctv_entries:
-            self.cctv_treeview.insert("", tk.END, values=entry)
+            # Fetch all entries directly in the Treeview insertion
+            self.cursor.execute("SELECT cctv_number, cctv_ip FROM cctv")
+            cctv_entries = self.cursor.fetchall()
+
+            # Modify the returned dictionary with names as keys and IP addresses as values
+            cctv_data = {f"{entry[0]}": entry[1] for entry in cctv_entries}
+
+            for name, ip_address in cctv_data.items():
+                self.cctv_treeview.insert("", tk.END, values=(name, ip_address))
+
+            return cctv_data
+
+        except Exception as e:
+            print(f"Error loading CCTV table: {e}")
+            return None
+
 
     def delete_cctv(self):
         selected_item = self.cctv_treeview.selection()

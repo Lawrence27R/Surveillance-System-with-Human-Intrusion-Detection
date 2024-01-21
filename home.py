@@ -40,14 +40,18 @@ class Homepage(tk.Frame):
 
         self.pack(fill=tk.BOTH, expand=True)
 
+        # CCTV Table Section
         self.conn, self.cursor = mysql_db.initialize_connection()
+        self.add_cctv_section = AddCCTVSection(self.main_content, self.conn, self.cursor)
         self.logged_in_email = "rootuser@gmail.com"
 
+        # Other sections
         self.rec_and_logs_section = RecAndLogsSection(self.main_content)
         self.new_registration_section = NewRegistrationSection(self.main_content)
         self.add_details_section = AddDetailsSection(self.main_content)
 
-        self.home_content = HomeContent(self.main_content)
+        # Home section
+        self.home_content = HomeContent(self.main_content, self.add_cctv_section)
         self.current_section = None  # Initialize current_section to None
 
         self.show_section(self.home_content)  # Show home_content by default
@@ -100,7 +104,7 @@ class Homepage(tk.Frame):
         elif item == "Add Details":
             self.show_section(self.add_details_section)
         elif item == "Add CCTV":
-            self.show_section(AddCCTVSection(self.main_content, self.conn, self.cursor))
+            self.show_section(self.add_cctv_section)
         elif item == "Home":
             self.show_section(self.home_content)
         else:
