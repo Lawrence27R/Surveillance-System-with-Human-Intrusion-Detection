@@ -86,18 +86,23 @@ class HomeContent(tk.Frame):
         self.camera_dropdown.grid(row=1, column=3, sticky="w", padx=10, pady=5)
  
     def start_video_feed(self):
-        # Replace 'your_ip_camera_address' with the actual IP camera address
-        ip_addr = self.cctv_addresses[self.camera_selection_var.get()]
-        ip_camera_address = f"http://{ip_addr}/video"
- 
-        self.vid = cv2.VideoCapture(ip_camera_address)
- 
+        selected_camera = self.camera_selection_var.get()
+
+        if selected_camera and selected_camera in self.cctv_addresses:
+            # If an IP camera address is selected, use it
+            ip_addr = self.cctv_addresses[selected_camera]
+            ip_camera_address = f"http://{ip_addr}/video"
+            self.vid = cv2.VideoCapture(ip_camera_address)
+        else:
+            # If no IP camera address is selected, use the default webcam
+            self.vid = cv2.VideoCapture(0)  # Use 0 as the argument for the default webcam
+
         if self.vid.isOpened():
             self.is_recording = True
             self.after(10, self.update_video_feed)
         else:
             messagebox.showerror("Error", "Unable to open the video feed.")
- 
+
     def update_video_feed(self):
         if self.is_recording:
             ret, frame = self.vid.read()
