@@ -18,6 +18,7 @@ class NewRegistrationSection(tk.Frame):
         self.create_table()
         self.create_train_widgets()
         self.create_delete_button()
+        self.update_table()
 
     def initialize_connection(self):
         self.conn, self.cursor = initialize_connection()
@@ -128,9 +129,10 @@ class NewRegistrationSection(tk.Frame):
         return self.cursor.fetchall()
 
     def delete_selected_entry(self, event=None):
-        selected_item = self.table.selection()
+        selected_item = self.table.focus()
+        selected_item = self.table.item(selected_item, 'values')[0]
         if selected_item:
-            selected_id = selected_item[0]
+            selected_id = selected_item
             self.delete_user_from_database(selected_id)
             for i, entry in enumerate(self.data_entries):
                 if entry[0] == selected_id:
@@ -140,9 +142,9 @@ class NewRegistrationSection(tk.Frame):
 
     def delete_user_from_database(self, user_id):
         folder_path = os.path.join('User_Images', f"{user_id}_{self.username_var.get()}")
-        delete_query = "DELETE FROM newreg WHERE user_id = %s"
+        delete_query = f"DELETE FROM newreg WHERE user_id = {user_id}"
         try:
-            self.cursor.execute(delete_query, (int(user_id),))
+            self.cursor.execute(delete_query)
             self.conn.commit()
         except Exception as e:
             messagebox.showerror("Delete Error", f"Error deleting user from the database: {str(e)}")
