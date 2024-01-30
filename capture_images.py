@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 def capture_images(user_id, username):
-    user_image_dir = os.path.join('User_Images', f"{user_id}_{username}")
+    user_image_dir = os.path.join('datasets/new_persons', f"{user_id}_{username}")
     os.makedirs(user_image_dir, exist_ok=True)
 
     cap = cv2.VideoCapture(0)
@@ -35,7 +35,7 @@ def capture_images(user_id, username):
             if key in (27, ord('q')):
                 break
             elif key == 99 or key == 67:
-                img_file = os.path.join(user_image_dir, f"{user_id}_{username}_{image_number}.jpg")
+                img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
                 cv2.imwrite(img_file, face_pixels)
                 print(f"Image {image_number} captured and saved as {img_file}")
                 image_number += 1
@@ -49,7 +49,7 @@ def capture_images(user_id, username):
             if key in (27, ord('q')):
                 break
             elif key == 99 or key == 67:
-                img_file = os.path.join(user_image_dir, f"{user_id}_{username}_{image_number}.jpg")
+                img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
                 cv2.imwrite(img_file, face_pixels)
                 print(f"Image {image_number} captured and saved as {img_file}")
                 image_number += 1

@@ -9,3 +9,14 @@ __pycache__/
 User_Images/
 
 Env/
+datasets/data
+datasets/backup
+datasets/new_persons
+files/lam
+files/phuoc
+face_detection/scrfd/weights/
+face_detection
+face_detection/yolov5_face/weights/
+face_recognitions/arcface/weights/
+face_tracking/pretrained/
+

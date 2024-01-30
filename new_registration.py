@@ -142,7 +142,7 @@ class NewRegistrationSection(tk.Frame):
             self.update_table()
 
     def delete_user_from_database(self, user_id):
-        folder_path = os.path.join('User_Images', f"{user_id}_{self.username_var.get()}")
+        folder_path = os.path.join('datasets/new_persons', f"{user_id}_{self.username_var.get()}")
         delete_query = f"DELETE FROM newreg WHERE user_id = {user_id}"
         try:
             self.cursor.execute(delete_query)
@@ -163,7 +163,7 @@ class NewRegistrationSection(tk.Frame):
         user_ids = set()
         for entry in self.data_entries:
             user_id, username = entry[0], entry[1]
-            folder_path = os.path.join('User_Images', f"{user_id}_{username}")
+            folder_path = os.path.join('datasets/new_persons', f"{user_id}_{username}")
             if os.path.exists(folder_path):
                 for image_name in os.listdir(folder_path):
                     image_path = os.path.join(folder_path, image_name)
