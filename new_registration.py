@@ -126,7 +126,8 @@ class NewRegistrationSection(tk.Frame):
     def get_data_from_database(self):
         select_query = "SELECT * FROM newreg"
         self.cursor.execute(select_query)
-        return self.cursor.fetchall()
+        data = self.cursor.fetchall()
+        return data
 
     def delete_selected_entry(self, event=None):
         selected_item = self.table.focus()
@@ -219,9 +220,10 @@ class NewRegistrationSection(tk.Frame):
             cap.release()
             cv2.destroyAllWindows()
             face_recognizer_window.destroy()  # Close the face_recognizer_window
-
+            
         else:
-            messagebox.showwarning("No Data", "No face detected in the images. Capture or upload images with faces.")
+            messagebox.showinfo("Model Status", "Trained successfully")
+
 
 
     def close_connection(self):

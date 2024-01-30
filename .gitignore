@@ -1,1 +1,11 @@
-Env
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# User Directories
+User_Images/
+
+Env/

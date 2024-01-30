@@ -9,10 +9,8 @@ def capture_images(user_id, username):
 
     cap = cv2.VideoCapture(0)
 
-    # Load Haar Cascade classifiers for frontal and profile faces
     face_cascade_frontal = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    face_cascade_profile = cv2.CascadeClassifier('haarcascade_profileface.xml')  # Rep  lace with the actual path
-
+    face_cascade_profile = cv2.CascadeClassifier('haarcascade_profileface.xml') 
     image_number = 1
 
     while True:
@@ -24,13 +22,10 @@ def capture_images(user_id, username):
 
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Detect faces from the frontal view
         frontal_faces = face_cascade_frontal.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
 
-        # Detect faces from the profile view
         profile_faces = face_cascade_profile.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
 
-        # Draw rectangles for frontal faces
         for (x, y, width, height) in frontal_faces:
             face_pixels = frame[y:y + height, x:x + width]
             cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
@@ -45,7 +40,6 @@ def capture_images(user_id, username):
                 print(f"Image {image_number} captured and saved as {img_file}")
                 image_number += 1
 
-        # Draw rectangles for profile faces
         for (x, y, width, height) in profile_faces:
             face_pixels = frame[y:y + height, x:x + width]
             cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
