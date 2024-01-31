@@ -30,7 +30,7 @@ class Homepage(tk.Frame):
         self.sidebar_frame = tk.Frame(self, bg="#21252b", relief=tk.SUNKEN)
         self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-        self.sidebar = Sidebar(self, self.show_username, self.change_main_content)
+        self.sidebar = Sidebar(self, self.change_main_content)
         self.sidebar.pack(side=tk.LEFT, fill=tk.Y, expand=False)
 
         tk.Frame(self.sidebar_frame, width=2, bg="#21252b").pack(side=tk.LEFT, fill=tk.Y)
@@ -56,13 +56,6 @@ class Homepage(tk.Frame):
 
         self.show_section(self.home_content)  # Show home_content by default
 
-    def show_username(self):
-        self.cursor.execute(f"SELECT email FROM users WHERE email = '{self.logged_in_email}'")
-        result = self.cursor.fetchone()
-        if result:
-            self.sidebar.show_username(result[0])
-        else:
-            self.sidebar.show_username("Username not found")
 
     def open_change_password_window(self):
         ChangePasswordWindow(self, self.change_password)

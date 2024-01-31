@@ -22,7 +22,7 @@ class NavigationBar(tk.Frame):
         account_label.pack(side=tk.RIGHT, padx=0)
 
         account_menu = Menu(master.master, tearoff=0)
-        account_menu.add_command(label="Username", command=master.show_username)
+        account_menu.add_command(label="Username")
         account_menu.add_command(label="Change Password", command=master.open_change_password_window)
         account_menu.add_separator()
         account_menu.add_command(label="Logout", command=master.logout)

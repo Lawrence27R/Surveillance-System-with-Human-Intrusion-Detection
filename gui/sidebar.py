@@ -2,11 +2,10 @@ from PIL import Image, ImageTk
 import tkinter as tk
 
 class Sidebar(tk.Frame):
-    def __init__(self, master, show_username_callback, change_main_content_callback):
+    def __init__(self, master, change_main_content_callback):
         super().__init__(master, bg="#21252b")
 
         self.master = master
-        self.show_username_callback = show_username_callback
         self.change_main_content_callback = change_main_content_callback
 
         self.create_sidebar_labels()
@@ -38,8 +37,6 @@ class Sidebar(tk.Frame):
             label.bind("<Button-1>", lambda event, item=item: self.change_main_content_callback(item))
             label.pack(side=tk.TOP, fill=tk.X)
 
-    def show_username(self, username):
-        self.username_label.config(text=f"Username: {username}")
 
     def load_and_resize_image(self, image_path, width=None, height=None):
         try:
