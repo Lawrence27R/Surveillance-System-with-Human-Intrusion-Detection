@@ -4,8 +4,16 @@ import os
 import shutil
 from mysql_db import initialize_connection
 from capture_images import capture_images
-import face_recognition
-import cv2
+# import argparse
+# import cv2
+# import numpy as np
+# import torch
+# from torchvision import transforms
+
+# from face_detection.scrfd.detector import SCRFD
+# from face_detection.yolov5_face.detector import Yolov5Face
+# from face_recognitions.arcface.model import iresnet_inference
+# from face_recognitions.arcface.utils import read_features
 
 class NewRegistrationSection(tk.Frame):
     def __init__(self, master):
@@ -16,7 +24,7 @@ class NewRegistrationSection(tk.Frame):
         self.initialize_connection()
         self.create_registration_widgets()
         self.create_table()
-        self.create_train_widgets()
+        # self.create_train_widgets()
         self.create_delete_button()
         self.update_table()
 
@@ -156,75 +164,6 @@ class NewRegistrationSection(tk.Frame):
         folder_path = filedialog.askdirectory(initialdir="D:/Final Year", title="Select Folder")
         if folder_path:
             os.system(f'explorer "{folder_path}"')
-
-    def train_model(self):
-        images = []
-        labels = []
-        user_ids = set()
-        for entry in self.data_entries:
-            user_id, username = entry[0], entry[1]
-            folder_path = os.path.join('datasets/new_persons', f"{user_id}_{username}")
-            if os.path.exists(folder_path):
-                for image_name in os.listdir(folder_path):
-                    image_path = os.path.join(folder_path, image_name)
-                    user_ids.add(user_id)
-
-                    # Load image and find face encodings
-                    image = face_recognition.load_image_file(image_path)
-                    face_encodings = face_recognition.face_encodings(image)
-
-                    if len(face_encodings) > 0:
-                        images.append(face_encodings[0])
-                        labels.append(user_id)
-
-        if images and labels:
-            known_face_encodings = images
-            known_face_ids = labels
-            known_face_names = [entry[1] for entry in self.data_entries]
-
-            face_recognizer_window = tk.Toplevel(self.master)
-            face_recognizer_window.title("Face Recognition Output")
-
-            cap = cv2.VideoCapture(0)
-
-            while True:
-                ret, frame = cap.read()
-                small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-                rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-
-                face_locations = face_recognition.face_locations(rgb_small_frame)
-                face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-
-                for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-                    matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-                    name = "Unknown"
-
-                    if True in matches:
-                        first_match_index = matches.index(True)
-                        name = known_face_names[first_match_index]
-
-                    top *= 4
-                    right *= 4
-                    bottom *= 4
-                    left *= 4
-
-                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-                    font = cv2.FONT_HERSHEY_DUPLEX
-                    cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
-
-                cv2.imshow("Face Recognition Output", frame)
-
-                if cv2.waitKey(1) & 0xFF in (27, ord('q')):
-                    break
-
-            cap.release()
-            cv2.destroyAllWindows()
-            face_recognizer_window.destroy()  # Close the face_recognizer_window
-            
-        else:
-            messagebox.showinfo("Model Status", "Trained successfully")
-
-
 
     def close_connection(self):
         self.cursor.close()
