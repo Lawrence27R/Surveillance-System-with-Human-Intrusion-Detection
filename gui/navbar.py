@@ -10,7 +10,7 @@ class NavigationBar(tk.Frame):
         cctv_logo_resized = master.load_and_resize_image(cctv_logo_path, width=33, height=38)
         cctv_logo_label = Label(self, image=cctv_logo_resized, bg="#21252b")
         cctv_logo_label.image = cctv_logo_resized
-        cctv_logo_label.pack(side=tk.LEFT, padx=0)
+        cctv_logo_label.pack(side=tk.LEFT, padx=8)
 
         self.username_label = tk.Label(self, text="", font=('Century Gothic', 12), bg="#21252b", fg="white")
         self.username_label.pack(side=tk.LEFT, expand=True)
@@ -40,11 +40,11 @@ class NavigationBar(tk.Frame):
 
         self.pack(fill=tk.X, side=tk.TOP)
 
-        cctv_logo_label.pack(side=tk.LEFT, padx=0)
+        cctv_logo_label.pack(side=tk.LEFT, padx=6)
         self.username_label.pack(side=tk.LEFT, expand=True, padx=0)
-        account_label.pack(side=tk.RIGHT, padx=0)
-        about_us_label.pack(side=tk.RIGHT, padx=0)
-        about_project_label.pack(side=tk.RIGHT, padx=0)
+        account_label.pack(side=tk.RIGHT, padx=12)
+        about_us_label.pack(side=tk.RIGHT, padx=20)
+        about_project_label.pack(side=tk.RIGHT, padx=20)
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -12,7 +12,7 @@ class LoginWindow(tk.Frame):
         super().__init__()
         self.master = master
         self.master.title("Surveillance System with Human Intrusion Detection")
-        self.master.geometry("1400x720+0+0")
+        self.master.geometry("1400x720+80+100")
         self.master.withdraw()
 
         style = ThemedStyle(self.master)

@@ -30,7 +30,7 @@ class Sidebar(tk.Frame):
                 font=('Century Gothic', 12),
                 bg="#21252b",
                 fg="white",
-                padx=10,
+                padx=16,
                 pady=20,
                 anchor="w",
             )
@@ -55,6 +55,6 @@ class Sidebar(tk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    sidebar = Sidebar(root, None, None)  # Pass the callbacks when you instantiate Sidebar
+    sidebar = Sidebar(root, None, None)
     sidebar.pack(side=tk.LEFT, fill=tk.Y, expand=False)
     root.mainloop()

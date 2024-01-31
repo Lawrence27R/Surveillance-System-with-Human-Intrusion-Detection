@@ -17,7 +17,7 @@ class Homepage(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master.title("Surveillance System with Human Intrusion Detection")
-        self.master.geometry("1400x720+0+0")
+        self.master.geometry("1400x720+80+100")
 
         style = ThemedStyle(self.master)
         style.set_theme("arc")
@@ -27,7 +27,7 @@ class Homepage(tk.Frame):
         self.navbar = NavigationBar(self)
         self.navbar.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0) 
 
-        self.sidebar_frame = tk.Frame(self, bg="#21252b", bd=2, relief=tk.SUNKEN)
+        self.sidebar_frame = tk.Frame(self, bg="#21252b", relief=tk.SUNKEN)
         self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
 
         self.sidebar = Sidebar(self, self.show_username, self.change_main_content)

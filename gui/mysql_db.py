@@ -47,10 +47,10 @@ conn, cursor = initialize_connection()
 login_data = {"email": "rootuser@gmail.com", "password": "root123"}
 
 # Test the login function
-if login(cursor, login_data):
-    print("Login successful!")
-else:
-    print("Login failed.")
+# if login(cursor, login_data):
+#     print("Login successful!")
+# else:
+#     print("Login failed.")
 
 # Close the database connection
 cursor.close()
