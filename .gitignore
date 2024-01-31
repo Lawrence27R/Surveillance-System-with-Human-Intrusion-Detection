@@ -15,7 +15,7 @@ datasets/new_persons
 files/lam
 files/phuoc
 face_detection/scrfd/weights/
-face_detection
+face_detection/retinaface/weights/
 face_detection/yolov5_face/weights/
 face_recognitions/arcface/weights/
 face_tracking/pretrained/
