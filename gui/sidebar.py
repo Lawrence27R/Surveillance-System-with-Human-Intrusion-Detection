@@ -12,11 +12,11 @@ class Sidebar(tk.Frame):
 
     def create_sidebar_labels(self):
         logo_paths = {
-            "Home": "images/icons/cil-home.png",
-            "New Registration": "images/icons/icons8-add-administrator-18.png",
-            "Add CCTV": "images/icons/icons8-add-camera-18.png",
-            "Add Details": "images/icons/icons8-registration-18.png",
-            "REC & LOGS": "images/icons/icons8-recording-18.png",
+            "Home": "gui/images/icons/cil-home.png",
+            "New Registration": "gui/images/icons/icons8-add-administrator-18.png",
+            "Add CCTV": "gui/images/icons/icons8-add-camera-18.png",
+            "Add Details": "gui/images/icons/icons8-registration-18.png",
+            "REC & LOGS": "gui/images/icons/icons8-recording-18.png",
         }
 
         for item, logo_path in logo_paths.items():

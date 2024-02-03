@@ -2,18 +2,11 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 import shutil
-from mysql_db import initialize_connection
-from capture_images import capture_images
-# import argparse
-# import cv2
-# import numpy as np
-# import torch
-# from torchvision import transforms
-
-# from face_detection.scrfd.detector import SCRFD
-# from face_detection.yolov5_face.detector import Yolov5Face
-# from face_recognitions.arcface.model import iresnet_inference
-# from face_recognitions.arcface.utils import read_features
+import cv2
+from gui.mysql_db import DatabaseHandler
+# from capture_images import capture_images
+from PIL import Image, ImageTk
+from add_persons import add_persons
 
 class NewRegistrationSection(tk.Frame):
     def __init__(self, master):
@@ -24,12 +17,12 @@ class NewRegistrationSection(tk.Frame):
         self.initialize_connection()
         self.create_registration_widgets()
         self.create_table()
-        # self.create_train_widgets()
         self.create_delete_button()
         self.update_table()
 
     def initialize_connection(self):
-        self.conn, self.cursor = initialize_connection()
+        self.database = DatabaseHandler()
+        self.conn, self.cursor = self.database.initialize_connection()
 
     def create_registration_widgets(self):
         title_label = tk.Label(self, text="Register New User:", font=('Century Gothic', 16, 'bold'), bg="#232831", fg="white", pady=8)
@@ -70,6 +63,18 @@ class NewRegistrationSection(tk.Frame):
         )
         upload_button.grid(row=3, column=2, pady=(10, 20), padx=5, sticky="w")
 
+        add_person_button = tk.Button(
+            self,
+            text="Add Persons",
+            command=self.add_person_button_clicked,
+            bg="#1565C0",
+            fg="white",
+            font=("Helvetica", 12),
+            relief=tk.FLAT,
+        )
+        add_person_button.grid(row=7, column=0, pady=(8, 25), sticky="w")
+
+
     def create_table(self):
         headers = ["User ID", "Username"]
         self.table = ttk.Treeview(self, columns=headers, show="headings", selectmode="browse", height=11)
@@ -93,21 +98,17 @@ class NewRegistrationSection(tk.Frame):
             relief=tk.FLAT,
         )
         delete_button.grid(row=5, column=0, pady=(8, 25), sticky="w")
+    
+    def add_person_button_clicked(self):
+        # Call the add_persons function here
+        backup_dir = "datasets/backup"
+        add_persons_dir = "datasets/new_persons/"
+        faces_save_dir = "datasets/data/"
+        features_path = "datasets/face_features/feature"
 
-    def create_train_widgets(self):
-        train_button = tk.Button(
-            self,
-            text="Train Model",
-            command=self.train_model,
-            bg="#1565C0",
-            fg="white",
-            font=("Helvetica", 12),
-            relief=tk.FLAT,
-        )
-        train_button.grid(row=6, column=0, pady=8, sticky="w")
+        add_persons(backup_dir, add_persons_dir, faces_save_dir, features_path)
 
-        training_status_label = tk.Label(self, text="Training status:", font=('Century Gothic', 12), bg="#232831", fg="white")
-        training_status_label.grid(row=7, column=0, pady=4, sticky="w")
+
 
     def capture_images(self):
         user_id = self.user_id_var.get()
@@ -115,7 +116,64 @@ class NewRegistrationSection(tk.Frame):
         if not user_id or not username:
             messagebox.showwarning("Incomplete Information", "Please enter User ID and Username.")
             return
-        capture_images(user_id, username)
+        # capture_images(user_id, username)
+        user_image_dir = os.path.join('datasets/new_persons/', f"{user_id}_{username}")
+        os.makedirs(user_image_dir, exist_ok=True)
+
+        cap = cv2.VideoCapture(0)
+
+        face_cascade_frontal = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        face_cascade_profile = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_profileface.xml') 
+        image_number = 1
+
+        while True:
+            ret, frame = cap.read()
+
+            if not ret:
+                messagebox.showerror("Capture Error", "Failed to capture video.")
+                break
+
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            frontal_faces = face_cascade_frontal.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
+
+            profile_faces = face_cascade_profile.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
+
+            for (x, y, width, height) in frontal_faces:
+                face_pixels = frame[y:y + height, x:x + width]
+                cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+                cv2.imshow("Capture Images", frame)
+
+                key = cv2.waitKey(1)
+                if key in (27, ord('q')):
+                    break
+                elif key == 99 or key == 67:
+                    img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
+                    cv2.imwrite(img_file, face_pixels)
+                    print(f"Image {image_number} captured and saved as {img_file}")
+                    image_number += 1
+
+            for (x, y, width, height) in profile_faces:
+                face_pixels = frame[y:y + height, x:x + width]
+                cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+                cv2.imshow("Capture Images", frame)
+
+                key = cv2.waitKey(1)
+                if key in (27, ord('q')):
+                    break
+                elif key == 99 or key == 67:
+                    img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
+                    cv2.imwrite(img_file, face_pixels)
+                    print(f"Image {image_number} captured and saved as {img_file}")
+                    image_number += 1
+
+            cv2.imshow("Capture Images", frame)
+
+            if cv2.waitKey(1) & 0xFF in (27, ord('q')):
+                break
+
+        cap.release()
+        cv2.destroyAllWindows()
         self.insert_user_into_database(user_id, username)
         self.update_table()
 
@@ -150,7 +208,7 @@ class NewRegistrationSection(tk.Frame):
             self.update_table()
 
     def delete_user_from_database(self, user_id):
-        folder_path = os.path.join('datasets/new_persons', f"{user_id}_{self.username_var.get()}")
+        folder_path = os.path.join('../datasets/new_persons', f"{user_id}_{self.username_var.get()}")
         delete_query = f"DELETE FROM newreg WHERE user_id = {user_id}"
         try:
             self.cursor.execute(delete_query)
@@ -161,9 +219,51 @@ class NewRegistrationSection(tk.Frame):
             shutil.rmtree(folder_path, ignore_errors=True)
 
     def upload_images(self):
-        folder_path = filedialog.askdirectory(initialdir="D:/Final Year", title="Select Folder")
-        if folder_path:
-            os.system(f'explorer "{folder_path}"')
+        file_paths = filedialog.askopenfilenames(
+            initialdir="/home/lawrence/Downloads",  # Set your initial directory
+            title="Select Images",
+            filetypes=[("Image files", "*.jpg;*.jpeg;*.png")],
+        )
+
+        if file_paths:
+            destination_folder = filedialog.askdirectory(
+                initialdir="/home/lawrence/Downloads",  # Set your initial directory
+                title="Select Destination Folder",
+            )
+
+            if destination_folder:
+                for file_path in file_paths:
+                    # Get the file name from the path
+                    file_name = os.path.basename(file_path)
+                    # Create the destination path
+                    destination_path = os.path.join(destination_folder, file_name)
+
+                    try:
+                        # Copy the file to the destination folder
+                        shutil.copy(file_path, destination_path)
+
+                        # Display the copied image on a canvas
+                        self.display_image(destination_path)
+
+                    except Exception as e:
+                        messagebox.showerror(
+                            "Copy Error",
+                            f"Error copying image '{file_name}': {str(e)}"
+                        )
+
+                messagebox.showinfo("Upload Successful", "Images uploaded successfully.")
+
+    def display_image(self, image_path):
+        # Open the image using PIL
+        image = Image.open(image_path)
+        # Convert the PIL Image to Tkinter PhotoImage
+        tk_image = ImageTk.PhotoImage(image)
+
+        # Create a canvas to display the image
+        canvas = tk.Canvas(self, width=image.width, height=image.height)
+        canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
+        canvas.pack()
+
 
     def close_connection(self):
         self.cursor.close()

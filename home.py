@@ -3,15 +3,16 @@ from tkinter import ttk, filedialog, messagebox
 from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk
 import os
-import mysql_db
-from change_password import ChangePasswordWindow
-from navbar import NavigationBar
-from rec_and_logs import RecAndLogsSection
-from new_registration import NewRegistrationSection
-from add_details import AddDetailsSection
-from add_cctv import AddCCTVSection
-from sidebar import Sidebar
-from homecontent import HomeContent
+from gui.mysql_db import DatabaseHandler
+from gui.change_password import ChangePasswordWindow
+from gui.navbar import NavigationBar
+from gui.rec_and_logs import RecAndLogsSection
+from gui.new_registration import NewRegistrationSection
+from gui.add_details import AddDetailsSection
+from gui.add_cctv import AddCCTVSection
+from gui.sidebar import Sidebar
+from gui.homecontent import HomeContent
+
 
 class Homepage(tk.Frame):
     def __init__(self, master):
@@ -41,7 +42,8 @@ class Homepage(tk.Frame):
         self.pack(fill=tk.BOTH, expand=True)
 
         # CCTV Table Section
-        self.conn, self.cursor = mysql_db.initialize_connection()
+        self.database = DatabaseHandler()
+        self.conn, self.cursor = self.database.initialize_connection()
         self.add_cctv_section = AddCCTVSection(self.main_content, self.conn, self.cursor)
         self.logged_in_email = "rootuser@gmail.com"
 

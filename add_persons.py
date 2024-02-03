@@ -143,34 +143,34 @@ def add_persons(backup_dir, add_persons_dir, faces_save_dir, features_path):
     print("Successfully added new person!")
 
 
-if __name__ == "__main__":
-    # Parse command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--backup-dir",
-        type=str,
-        default="./datasets/backup",
-        help="Directory to save person data.",
-    )
-    parser.add_argument(
-        "--add-persons-dir",
-        type=str,
-        default="./datasets/new_persons",
-        help="Directory to add new persons.",
-    )
-    parser.add_argument(
-        "--faces-save-dir",
-        type=str,
-        default="./datasets/data/",
-        help="Directory to save faces.",
-    )
-    parser.add_argument(
-        "--features-path",
-        type=str,
-        default="./datasets/face_features/feature",
-        help="Path to save face features.",
-    )
-    opt = parser.parse_args()
+# if __name__ == "__main__":
+#     # Parse command line arguments
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument(
+#         "--backup-dir",
+#         type=str,
+#         default="./datasets/backup",
+#         help="Directory to save person data.",
+#     )
+#     parser.add_argument(
+#         "--add-persons-dir",
+#         type=str,
+#         default="./datasets/new_persons",
+#         help="Directory to add new persons.",
+#     )
+#     parser.add_argument(
+#         "--faces-save-dir",
+#         type=str,
+#         default="./datasets/data/",
+#         help="Directory to save faces.",
+#     )
+#     parser.add_argument(
+#         "--features-path",
+#         type=str,
+#         default="./datasets/face_features/feature",
+#         help="Path to save face features.",
+#     )
+#     opt = parser.parse_args()
 
-    # Run the main function
-    add_persons(**vars(opt))
+#     # Run the main function
+#     add_persons(**vars(opt))

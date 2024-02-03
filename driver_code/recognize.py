@@ -28,7 +28,7 @@ recognizer = iresnet_inference(
 )
 
 # Load precomputed face features and names
-images_names, images_embs = read_features(feature_path="./datasets/face_features/feature")
+images_names, images_embs = read_features(feature_path="../datasets/face_features/feature")
 
 # Mapping of face IDs to names
 id_face_mapping = {}

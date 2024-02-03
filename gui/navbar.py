@@ -6,7 +6,7 @@ class NavigationBar(tk.Frame):
     def __init__(self, master):
         super().__init__(master, bg="#21252b")
 
-        cctv_logo_path = "images/icons/icons8-cctv-18.png"
+        cctv_logo_path = "gui/images/icons/icons8-cctv-18.png"
         cctv_logo_resized = master.load_and_resize_image(cctv_logo_path, width=33, height=38)
         cctv_logo_label = Label(self, image=cctv_logo_resized, bg="#21252b")
         cctv_logo_label.image = cctv_logo_resized
@@ -15,7 +15,7 @@ class NavigationBar(tk.Frame):
         self.username_label = tk.Label(self, text="", font=('Century Gothic', 12), bg="#21252b", fg="white")
         self.username_label.pack(side=tk.LEFT, expand=True)
 
-        account_icon_path = "images/icons/icons8-test-account-18.png"
+        account_icon_path = "gui/images/icons/icons8-test-account-18.png"
         account_icon_resized = master.load_and_resize_image(account_icon_path, width=30, height=30)
         account_label = Label(self, image=account_icon_resized, bg="#21252b")
         account_label.image = account_icon_resized

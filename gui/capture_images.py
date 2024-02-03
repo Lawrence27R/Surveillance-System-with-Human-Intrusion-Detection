@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 def capture_images(user_id, username):
-    user_image_dir = os.path.join('datasets/new_persons', f"{user_id}_{username}")
+    user_image_dir = os.path.join('../datasets/new_persons', f"{user_id}_{username}")
     os.makedirs(user_image_dir, exist_ok=True)
 
     cap = cv2.VideoCapture(0)

@@ -1,57 +1,51 @@
 import mysql.connector
 
-def initialize_connection():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="users"
-    )
+class DatabaseHandler:
+    def __init__(self):
+        self.conn, self.cursor = self.initialize_connection()
 
-    cursor = conn.cursor()
-    create_table(cursor)
-
-    return conn, cursor
-
-def create_table(cursor):
-    cursor.execute("SHOW TABLES")
-    temp = cursor.fetchall()
-    tables = [item[0] for item in temp]
-
-    if "users" not in tables:
-        cursor.execute("""CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            password VARCHAR(30),
-            email VARCHAR(100) UNIQUE
-        )""")
-
-def create_table_new(cursor):
-    # Add your table creation logic here
-    # Example:
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS newreg (
-            user_id INT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL
+    def initialize_connection(self):
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="users"
         )
-    """)
 
-def login(cursor, data):
-    cursor.execute(f"""SELECT * FROM users WHERE email = '{data["email"]}' 
-                       AND password = '{data["password"]}' """)
+        cursor = conn.cursor()
+        self.create_table(cursor)
+        
+        return conn, cursor
 
-    return cursor.fetchone() is not None
+    def create_table(self, cursor):
+        cursor.execute("SHOW TABLES")
+        temp = cursor.fetchall()
+        tables = [item[0] for item in temp]
 
-conn, cursor = initialize_connection()
+        if "users" not in tables:
+            cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                password VARCHAR(30),
+                email VARCHAR(100) UNIQUE
+            )""")
 
-# Example login data
-login_data = {"email": "rootuser@gmail.com", "password": "root123"}
+    def create_table_new(self):
+        # Add your table creation logic here
+        # Example:
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS newreg (
+                user_id INT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL
+            )
+        """)
 
-# Test the login function
-# if login(cursor, login_data):
-#     print("Login successful!")
-# else:
-#     print("Login failed.")
+    def login(self, data):
+        self.cursor.execute(f"""SELECT * FROM users WHERE email = '{data["email"]}' 
+                           AND password = '{data["password"]}' """)
 
-# Close the database connection
-cursor.close()
-conn.close()
+        return self.cursor.fetchone() is not None
+
+    def close_connection(self):
+        self.cursor.close()
+        self.conn.close()
+
