@@ -3,6 +3,11 @@ from tkinter import ttk, filedialog, messagebox
 from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk
 import os
+
+# Env vars
+from dotenv import load_dotenv
+load_dotenv()
+
 from gui.mysql_db import DatabaseHandler
 from gui.change_password import ChangePasswordWindow
 from gui.navbar import NavigationBar

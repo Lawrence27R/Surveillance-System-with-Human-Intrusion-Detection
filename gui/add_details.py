@@ -1,10 +1,19 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from gui.mysql_db import DatabaseHandler
 
 class AddDetailsSection(tk.Frame):
     def __init__(self, master):
         super().__init__(master, bg="#232831")
         self.create_user_details_widgets()
+        self.initialize_connection()
+        self.fetch_details()
+        
+
+    def initialize_connection(self):
+        self.database = DatabaseHandler()
+        self.conn, self.cursor = self.database.initialize_connection()
+        self.database.create_add_details_table(self.cursor)
 
     def create_user_details_widgets(self):
         add_details_label = tk.Label(self, text="ADD DETAILS", font=('Century Gothic', 16, 'bold'), bg="#232831", fg="white", pady=10)
@@ -44,6 +53,7 @@ class AddDetailsSection(tk.Frame):
             font=("Helvetica", 12),
             relief=tk.FLAT,
         )
+
         delete_button.grid(row=len(labels) + 1, column=0, columnspan=2)
 
         tk.Label(self, text="", bg="#232831", pady=1).pack(side=tk.TOP, fill=tk.X)
@@ -85,12 +95,61 @@ class AddDetailsSection(tk.Frame):
         tk.Label(self, text="", bg="#232831", pady=20).pack(side=tk.TOP, fill=tk.X)
 
     def add_details(self, details):
-        self.tree.insert("", "end", values=[""] + details)
+        try:
+            user_id, user_name, email, phone_number = details[0:]
+
+            query = """
+                INSERT INTO add_details (user_id, user_name, email, phone_number)
+                VALUES (%s, %s, %s, %s)
+            """
+            values = (user_id, user_name, email, phone_number)
+
+            self.cursor.execute(query, values)
+            self.conn.commit()
+
+            return True
+        except Exception as e:
+            print(f"Error adding details to database: {e}")
+            return False
+        finally:
+            self.fetch_details()  # Update the treeview after adding details
 
     def delete_selected(self):
         selected_items = self.tree.selection()
         for item in selected_items:
-            self.tree.delete(item)
+            item_id = self.tree.item(item, "values")[0]  # Assuming the first column is the item ID
+
+        try:
+            query = "DELETE FROM add_details WHERE user_id = %s"
+            values = (item_id,)
+
+            self.cursor.execute(query, values)
+            self.conn.commit()
+
+            return True
+        except Exception as e:
+            print(f"Error deleting details from database: {e}")
+            return False
+        finally:
+            self.fetch_details()  # Update the treeview after deleting details
+
+    def fetch_details(self):
+        try:
+            self.tree.delete(*self.tree.get_children())  # Clear the existing data in the treeview
+
+            query = "SELECT * FROM add_details"
+            self.cursor.execute(query)
+            rows = self.cursor.fetchall()
+
+            for row in rows:
+                self.tree.insert("", "end", values=row)
+        except Exception as e:
+            print(f"Error fetching details from database: {e}")
+
+    # def delete_selected(self):
+    #     selected_items = self.tree.selection()
+    #     for item in selected_items:
+    #         self.tree.delete(item)
 
 if __name__ == "__main__":
     root = tk.Tk()

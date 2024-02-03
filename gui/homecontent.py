@@ -2,12 +2,16 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import cv2
+import sys
+sys.path.append("..")
+from recognize import FaceRecognizer
 
 class HomeContent(tk.Frame):
     def __init__(self, master, add_cctv_section):
         super().__init__(master)
         self.add_cctv_section = add_cctv_section
         self.load_cctv_addrs()
+        self.recognizer = FaceRecognizer()
         self.configure(bg="#232831")
 
         # Surveillance System Controls
@@ -61,7 +65,19 @@ class HomeContent(tk.Frame):
     def toggle_surveillance(self):
         # Add code to toggle surveillance system and update label accordingly
         current_status = self.surveillance_status_label.cget("text")
-        new_status = "OFF" if "ON" in current_status else "ON"
+        # get the IP camera address
+        new_status = ""
+
+        addr = self.camera_selection_var.get()
+        ip_addr = self.cctv_addresses[addr] if addr != 'Select Camera' else 'Select Camera'
+
+        if current_status == "ON":
+            new_status = "OFF"
+            self.recognizer.destroy_window()
+        else:
+            new_status == "ON"
+            self.recognizer.main(ip_addr)
+
         self.surveillance_status_label.config(text=f"Surveillance System: {new_status}")
 
     def toggle_recording(self):

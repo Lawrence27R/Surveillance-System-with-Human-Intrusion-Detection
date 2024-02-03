@@ -29,15 +29,28 @@ class DatabaseHandler:
                 email VARCHAR(100) UNIQUE
             )""")
 
+    def create_add_details_table(self, cursor):
+        cursor.execute("SHOW TABLES")
+        temp = cursor.fetchall()
+        tables = [item[0] for item in temp]
+
+        if "add_details" not in tables:
+            cursor.execute("""CREATE TABLE IF NOT EXISTS add_details (
+                user_id INT PRIMARY KEY,
+                user_name VARCHAR(255),
+                email VARCHAR(100),
+                phone_number VARCHAR(20)
+            )""")
+
     def create_table_new(self):
-        # Add your table creation logic here
-        # Example:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS newreg (
                 user_id INT PRIMARY KEY,
                 username VARCHAR(255) NOT NULL
             )
         """)
+    
+
 
     def login(self, data):
         self.cursor.execute(f"""SELECT * FROM users WHERE email = '{data["email"]}' 

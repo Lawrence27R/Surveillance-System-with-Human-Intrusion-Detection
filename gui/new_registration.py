@@ -107,8 +107,7 @@ class NewRegistrationSection(tk.Frame):
         features_path = "datasets/face_features/feature"
 
         add_persons(backup_dir, add_persons_dir, faces_save_dir, features_path)
-
-
+        
 
     def capture_images(self):
         user_id = self.user_id_var.get()

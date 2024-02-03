@@ -2,21 +2,26 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*.pt
 # C extensions
 *.so
-
+*.pth
+*.onnx
 # User Directories
 User_Images/
+*.pth.tar
+
+# Env
+.env
 
 Env/
+email_alert/
 datasets/data
 datasets/backup
-datasets/new_persons
-files/lam
-files/phuoc
-face_detection/scrfd/weights/
-face_detection/retinaface/weights/
-face_detection/yolov5_face/weights/
-face_recognitions/arcface/weights/
-face_tracking/pretrained/
-
+datasets/new_persons/
+driver_code/face_detection/retinaface/weights/mobilenetV1X0.25_pretrain.tar
+driver_code/face_detection/retinaface/weights
+driver_code/face_detection/scrfd/weights
+driver_code/face_detection/yolov5_face/weights
+driver_code/face_recognitions/arcface/weights
+driver_code/face_tracking/pretrained
