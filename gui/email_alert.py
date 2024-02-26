@@ -10,7 +10,7 @@ from twilio.rest import Client
 database = DatabaseHandler()
 conn, cursor = database.initialize_connection()
 
-def send_email(image_filename):
+def send_email(image_filename, object_detected):
     # Send an email with the image as an attachment
     sender = os.environ['EMAIL_SENDER']
     password = os.environ['EMAIL_PASSWORD']
@@ -32,12 +32,13 @@ def send_email(image_filename):
     message['Subject'] = subject
     message.attach(MIMEText(email_body, 'html'))
 
-    # Attach the captured unknown face image
-    filename = os.path.basename(image_filename)
-    attachment = open(image_filename, "rb").read()
+    if image_filename:
+        # Attach the captured unknown face image
+        filename = os.path.basename(image_filename)
+        attachment = open(image_filename, "rb").read()
 
-    image = MIMEImage(attachment, name=filename)
-    message.attach(image)
+        image = MIMEImage(attachment, name=filename)
+        message.attach(image)
 
     toaddrs = [receiver] + cc
 

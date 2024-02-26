@@ -1,8 +1,6 @@
 import time
-
 import cv2
 import yaml
-
 from face_detection.scrfd.detector import SCRFD
 from face_detection.yolov5_face.detector import Yolov5Face
 from face_tracking.tracker.byte_tracker import BYTETracker
@@ -31,6 +29,14 @@ def inference(detector, args):
     # Initialize a tracker and a timer
     tracker = BYTETracker(args=args, frame_rate=30)
     frame_id = 0
+
+    # Save video
+    frame_width = int(cap.get(3))
+    frame_height = int(cap.get(4))
+    size = (frame_width, frame_height)
+    video = cv2.VideoWriter(
+        "/Video_Rec/face-tracking.mp4", cv2.VideoWriter_fourcc(*"mp4v"), 30, size
+    )
 
     while True:
         # Read a frame from the video capture
@@ -74,11 +80,8 @@ def inference(detector, args):
                 frame_count = 0
                 start_time = time.time_ns()
 
-            # # Draw bounding boxes and landmarks on the frame
-            # for i in range(len(bboxes)):
-            #     # Get location of the face
-            #     x1, y1, x2, y2, score = bboxes[i]
-            #     cv2.rectangle(online_im, (x1, y1), (x2, y2), (200, 200, 230), 2)
+            # Save the frame to the video
+            video.write(online_im)
 
             cv2.imshow("Face Tracking", online_im)
 
@@ -90,13 +93,15 @@ def inference(detector, args):
             break
         frame_id += 1
 
+    # Release video and camera, and close all OpenCV windows
+    video.release()
+    cap.release()
+    cv2.destroyAllWindows()
+
 
 def main():
     file_name = "./face_tracking/config/config_tracking.yaml"
     config_tracking = load_config(file_name)
-    # detector = Yolov5Face(
-    #     model_file="face_detection/yolov5_face/weights/yolov5m-face.pt"
-    # )
     detector = SCRFD(model_file="face_detection/scrfd/weights/scrfd_2.5g_bnkps.onnx")
 
     inference(detector=detector, args=config_tracking)

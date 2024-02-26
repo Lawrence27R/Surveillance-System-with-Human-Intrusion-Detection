@@ -1,19 +1,19 @@
+# recognize.py
 import threading
-from datetime import datetime
 import time
 import cv2
 import numpy as np
+import os
 import torch
 import yaml
 from torchvision import transforms
 from driver_code.face_alignment.alignment import norm_crop
 from driver_code.face_detection.scrfd.detector import SCRFD
-from driver_code.face_detection.yolov5_face.detector import Yolov5Face
 from driver_code.face_recognitions.arcface.model import iresnet_inference
 from driver_code.face_recognitions.arcface.utils import compare_encodings, read_features
 from driver_code.face_tracking.tracker.byte_tracker import BYTETracker
 from driver_code.face_tracking.tracker.visualize import plot_tracking    
-from gui.email_alert import send_email, call
+from gui.logs import LogsHandler  
 
 class FaceRecognizer:
     def __init__(self):
@@ -32,6 +32,10 @@ class FaceRecognizer:
             "tracking_bboxes": [],
         }
         self.exit_threads = False
+        self.logs_folder = "logs"
+        os.makedirs(self.logs_folder, exist_ok=True)
+
+        self.logs_handler = LogsHandler(logs_folder=self.logs_folder)
 
     def load_config(self, file_name):
         with open(file_name, "r") as stream:
@@ -136,10 +140,8 @@ class FaceRecognizer:
         if addr == "Select Camera":
             self.cap = cv2.VideoCapture(0)
         else:
-            # ip_addr = self.cctv_addresses[addr]
             ip_camera_address = f"http://{addr}/video"
             self.cap = cv2.VideoCapture(ip_camera_address)
-        # cap = cv2.VideoCapture(0)
 
         while True:
             _, img = self.cap.read()
@@ -156,8 +158,31 @@ class FaceRecognizer:
             if ch == 27 or ch == ord("q") or ch == ord("Q") or self.exit_threads:
                 break
 
+            # Recognition logic within the tracking loop
+            raw_image = self.data_mapping["raw_image"]
+            detection_landmarks = self.data_mapping["detection_landmarks"]
+            detection_bboxes = self.data_mapping["detection_bboxes"]
+            tracking_ids = self.data_mapping["tracking_ids"]
+            tracking_bboxes = self.data_mapping["tracking_bboxes"]
+
+            for i in range(len(tracking_bboxes)):
+                for j in range(len(detection_bboxes)):
+                    mapping_score = self.mapping_bbox(box1=tracking_bboxes[i], box2=detection_bboxes[j])
+                    if mapping_score > 0.9:
+                        face_alignment = norm_crop(img=raw_image, landmark=detection_landmarks[j])
+                        score, name = self.recognition(face_image=face_alignment)
+                        if name is not None:
+                            caption = self.logs_handler.perform_alert(name, score, face_alignment)
+
+                        self.id_face_mapping[tracking_ids[i]] = caption
+
+                        detection_bboxes = np.delete(detection_bboxes, j, axis=0)
+                        detection_landmarks = np.delete(detection_landmarks, j, axis=0)
+                        break
+
         self.cap.release()
-        self.destroy_window()
+        cv2.destroyAllWindows()
+
 
     def recognize(self):
         while True:
@@ -174,19 +199,7 @@ class FaceRecognizer:
                         face_alignment = norm_crop(img=raw_image, landmark=detection_landmarks[j])
                         score, name = self.recognition(face_image=face_alignment)
                         if name is not None:
-                            if score > 0.25 and score < 0.50:
-                                caption = "UNKNOWN"
-                                # Save the captured unknown face image
-                                current_time = datetime.now().strftime("%H%M%S%d_%Y%m")
-                                image_filename = f"email_alert/alert_{current_time}.jpg"
-                                cv2.imwrite(image_filename, face_alignment)
-                                send_email(image_filename)  # Pass the image filename to the email function
-                                time.sleep(1000)
-                            elif score > 0 and score < 0.25:
-                                call()
-                                time.sleep(10000)
-                            else:
-                                caption = f"{name}:{score:.2f}"
+                            caption = self.logs_handler.perform_alert(name, score, face_alignment)
 
                         self.id_face_mapping[tracking_ids[i]] = caption
 
@@ -196,25 +209,15 @@ class FaceRecognizer:
 
             # if tracking_bboxes == []:
             #     print("Waiting for a person...")
-
     def main(self, addr):
         config_tracking = self.load_config("driver_code/face_tracking/config/config_tracking.yaml")
 
-        thread_track = threading.Thread(
-            target=self.tracking,
-            args=(
-                self.detector,
-                config_tracking,
-                addr,
-            ),
-        )
-        thread_track.start()
+        try:
+            self.tracking(self.detector, config_tracking, addr)
+        except KeyboardInterrupt:
+            print("Interrupt received. Stopping processing...")
+            self.exit_threads = True
+            self.logs_handler.stop_processing()
 
-        thread_recognize = threading.Thread(target=self.recognize)
-        thread_recognize.start()
-
-        thread_track.join()
-        thread_recognize.join()
-
+        # Add any cleanup logic here if needed
         self.exit_threads = True
-

@@ -7,8 +7,8 @@ import platform
 class RecAndLogsSection(tk.Frame):
     def __init__(self, master):
         super().__init__(master, bg="#232831")
-        self.recording_path = "/home/lawrence/Videos"
-        self.logs_path = "/home/lawrence/Videos/LOGS"
+        self.recording_path = "/home/lawrence/Desktop/Surveillance-System-with-Human-Intrusion-Detection/Video_Rec"
+        self.logs_path = "/home/lawrence/Desktop/Surveillance-System-with-Human-Intrusion-Detection/logs"
         self.create_buttons()
 
     def create_buttons(self):

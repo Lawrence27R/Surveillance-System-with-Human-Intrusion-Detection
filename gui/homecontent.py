@@ -116,7 +116,7 @@ class HomeContent(tk.Frame):
             self.after(10, self.update_video_feed)
         else:
             messagebox.showerror("Error", "Unable to open the video feed.")
-
+    
     def update_video_feed(self):
         if self.is_recording:
             ret, frame = self.vid.read()
