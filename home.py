@@ -4,7 +4,6 @@ from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk
 import os
 
-# Env vars
 from dotenv import load_dotenv
 load_dotenv()
 

@@ -5,6 +5,7 @@ import cv2
 import sys
 sys.path.append("..")
 from recognize import FaceRecognizer
+from intruder_detection import ObjectDetection
 
 class HomeContent(tk.Frame):
     def __init__(self, master, add_cctv_section):
@@ -13,6 +14,7 @@ class HomeContent(tk.Frame):
         self.load_cctv_addrs()
         self.recognizer = FaceRecognizer()
         self.configure(bg="#232831")
+        self.detector = ObjectDetection()
 
         # Surveillance System Controls
         self.toggle_surveillance_button = tk.Button(self, text="ON/OFF", command=self.toggle_surveillance, font=('Century Gothic', 12), bg="#45aaf2", fg="white", padx=6, pady=5)
@@ -86,10 +88,14 @@ class HomeContent(tk.Frame):
         new_status = "OFF" if "ON" in current_status else "ON"
         self.recording_status_label.config(text=f"View Feed: {new_status}")
 
+        addr = self.camera_selection_var.get()
+        ip_addr = self.cctv_addresses[addr] if addr != 'Select Camera' else 'Select Camera'
+
         if new_status == "ON":
-            self.start_video_feed()
-        else:
-            self.stop_video_feed()
+            # self.start_video_feed()
+            self.detector.__call__(ip_addr)
+        # else:
+            # self.stop_video_feed()
 
     def load_cctv_addrs(self):
         self.camera_selection_var = tk.StringVar() # You can modify this based on your actual camera names

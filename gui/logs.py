@@ -2,13 +2,14 @@ from datetime import datetime
 import cv2
 import os
 import pandas as pd
-from gui.email_alert import send_email, call
+from .email_alert import send_email, call
 import threading
 import queue
 
 class LogsHandler:
     def __init__(self, logs_folder=""):
         self.logs_folder = logs_folder
+        self.notified = False
         os.makedirs(self.logs_folder, exist_ok=True)
 
         # Create a new Excel file with today's date
@@ -71,13 +72,13 @@ class LogsHandler:
             import traceback
             traceback.print_exc()
 
-    def email_alert(self, image_filename):
-        # Implement your email alert logic here
-        send_email(image_filename)
+    # def email_alert(self, image_filename):
+    #     # Implement your email alert logic here
+    #     send_email(image_filename)
 
-    def call_alert(self):
-        # Implement your call alert logic here
-        call()
+    # def call_alert(self):
+    #     # Implement your call alert logic here
+    #     call()
 
     def process_log_queue(self):
         while True:
@@ -99,19 +100,26 @@ class LogsHandler:
                 caption = "UNKNOWN"
                 with self.lock:
                     self.log_queue.put((caption, current_time, current_date))
+                
                 image_filename = f"email_alert/alert_{current_time}.jpg"
                 cv2.imwrite(image_filename, face_alignment)
-                with self.lock:
-                    self.email_alert(image_filename)
+                
+                if not self.notified:
+                    with self.lock:
+                        send_email(image_filename)
+                            
             elif score > 0 and score < 0.25:
                 caption = "UNKNOWN"
                 with self.lock:
                     self.log_queue.put((caption, current_time, current_date))
-                    self.call_alert()
+                    if not self.notified:
+                        call()
             else:
-                caption = f"{name}"
-                with self.lock:
-                    self.log_queue.put((caption, current_time, current_date))
+                    caption = f"{name}"
+                    with self.lock:
+                        self.log_queue.put((caption, current_time, current_date))
+
+            self.notified = True
 
             return caption
 

@@ -12,9 +12,8 @@ from gui.email_alert import send_email, call  # Import necessary functions
 os.environ['YOLO_VERBOSE'] = 'False'
 
 class ObjectDetection:
-    def __init__(self, capture_index):
+    def __init__(self):
         # default parameters
-        self.capture_index = capture_index
         self.email_sent = False
 
         self.model = YOLO("detection_model/yolov8m.pt")
@@ -64,8 +63,14 @@ class ObjectDetection:
         # Use the call function from email_alert.py
         call()
 
-    def __call__(self):
-        cap = cv2.VideoCapture(self.capture_index)
+    def __call__(self, addr):
+        if addr == "Select Camera":
+            cap = cv2.VideoCapture(0)
+        else:
+            ip_camera_address = f"http://{addr}/video"
+            cap = cv2.VideoCapture(ip_camera_address)
+
+        # cap = cv2.VideoCapture(capture_index)
         assert cap.isOpened()
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -80,22 +85,19 @@ class ObjectDetection:
             if len(class_ids) > 0:  # Only send email if not sent before
                 if not self.email_sent:
                     current_time = datetime.now().strftime("%H:%M:%S - %d/%m/%Y")
-                    self.send_email(len(class_ids))
+                    # self.send_email(len(class_ids))
 
                     # Make a call
-                    self.make_call()
+                    # self.make_call()
+                    print(f"Call init {current_time}")
 
                     self.email_sent = True
 
             self.display_fps(im0)
             cv2.imshow('YOLOv8 Detection', im0)
             frame_count += 1
-            key = cv2.waitKey(5) & 0xFF
+            key = cv2.waitKey(1) & 0xFF
             if key == 27 or key == ord('q'):  # Break on 'q' or ESC key
                 break
         cap.release()
         cv2.destroyAllWindows()
-
-detector = ObjectDetection(capture_index=0)
-
-detector()

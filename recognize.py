@@ -148,7 +148,7 @@ class FaceRecognizer:
             tracking_image = self.process_tracking(img, detector, tracker, args, frame_id, fps)
 
             frame_count += 1
-            if frame_count >= 30:
+            if frame_count >= 40:
                 fps = 1e9 * frame_count / (time.time_ns() - start_time)
                 frame_count = 0
                 start_time = time.time_ns()
