@@ -5,7 +5,7 @@ from mysql_db import DatabaseHandler
 import sys 
 from forgot_password import ForgotPasswordWindow
 
-sys.path.append("..")
+sys.path.append(".")
 from home import Homepage
 
 
@@ -84,7 +84,7 @@ class LoginWindow(tk.Frame):
         data["email"] = self.entry1.get()
         data["password"] = self.entry2.get()
 
-        if self.db.login(self.cursor, data):
+        if self.db.login(data):
             print("Successful Login")
             self.destroy_current_window()
             self.show_homepage()
