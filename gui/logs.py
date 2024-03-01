@@ -97,7 +97,7 @@ class LogsHandler:
             caption = None  # Default caption value
 
             if score > 0.25 and score < 0.50:
-                caption = "UNKNOWN"
+                caption = "INTRUDER"
                 with self.lock:
                     self.log_queue.put((caption, current_time, current_date))
                 
@@ -107,12 +107,14 @@ class LogsHandler:
                 if not self.notified:
                     with self.lock:
                         send_email(image_filename)
+                        print(f"Email sent: {current_time}")
                             
             elif score > 0 and score < 0.25:
-                caption = "UNKNOWN"
+                caption = "INTRUDER"
                 with self.lock:
                     self.log_queue.put((caption, current_time, current_date))
                     if not self.notified:
+                        # print(f"Call Initiated: {current_time}")
                         call()
             else:
                     caption = f"{name}"

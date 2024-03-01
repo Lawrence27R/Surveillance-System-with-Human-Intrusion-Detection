@@ -148,7 +148,7 @@ class FaceRecognizer:
             tracking_image = self.process_tracking(img, detector, tracker, args, frame_id, fps)
 
             frame_count += 1
-            if frame_count >= 40:
+            if frame_count >= 30:
                 fps = 1e9 * frame_count / (time.time_ns() - start_time)
                 frame_count = 0
                 start_time = time.time_ns()
@@ -207,8 +207,6 @@ class FaceRecognizer:
                         detection_landmarks = np.delete(detection_landmarks, j, axis=0)
                         break
 
-            # if tracking_bboxes == []:
-            #     print("Waiting for a person...")
     def main(self, addr):
         config_tracking = self.load_config("driver_code/face_tracking/config/config_tracking.yaml")
 

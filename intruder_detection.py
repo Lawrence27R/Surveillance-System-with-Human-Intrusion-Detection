@@ -16,7 +16,7 @@ class ObjectDetection:
         # default parameters
         self.email_sent = False
 
-        self.model = YOLO("detection_model/yolov8m.pt")
+        self.model = YOLO("detection_model/yolov8n.pt")
 
         # visual information
         self.annotator = None
@@ -72,8 +72,8 @@ class ObjectDetection:
 
         # cap = cv2.VideoCapture(capture_index)
         assert cap.isOpened()
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
         frame_count = 0
         while True:
             self.start_time = time()
@@ -85,18 +85,18 @@ class ObjectDetection:
             if len(class_ids) > 0:  # Only send email if not sent before
                 if not self.email_sent:
                     current_time = datetime.now().strftime("%H:%M:%S - %d/%m/%Y")
-                    # self.send_email(len(class_ids))
+                    self.send_email(len(class_ids))
 
                     # Make a call
-                    # self.make_call()
+                    self.make_call()
                     print(f"Call init {current_time}")
 
                     self.email_sent = True
 
             self.display_fps(im0)
-            cv2.imshow('YOLOv8 Detection', im0)
+            cv2.imshow('Human Intrusion Detection', im0)
             frame_count += 1
-            key = cv2.waitKey(1) & 0xFF
+            key = cv2.waitKey(1) & 0xFF  # Change the waitKey delay to 1
             if key == 27 or key == ord('q'):  # Break on 'q' or ESC key
                 break
         cap.release()

@@ -6,10 +6,12 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from gui.mysql_db import DatabaseHandler
 from twilio.rest import Client
+from datetime import datetime
 
 database = DatabaseHandler()
 conn, cursor = database.initialize_connection()
 
+current_time = datetime.now().strftime("%H:%M:%S")
 def send_email(image_filename, object_detected):
     # Send an email with the image as an attachment
     sender = os.environ['EMAIL_SENDER']
@@ -53,7 +55,7 @@ def send_email(image_filename, object_detected):
             msg=message.as_string(),
         )
 
-    print("Email sent")
+    print(f"Email sent: {current_time}")
 
 
 def call():
@@ -74,4 +76,4 @@ def call():
                             url='https://handler.twilio.com/twiml/EH4ec1a9bb230f23eb949ccd0642754612',
                         )
     
-    print("Call initianted")
+    print(f"Call Initiated: {current_time}")
