@@ -1,4 +1,6 @@
 import cv2
+import sys
+sys.path.append("..")
 from recognize import FaceRecognizer
 import threading
 

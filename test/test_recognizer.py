@@ -1,5 +1,7 @@
 import cv2
-from intruder_detection import ObjectDetection
+import sys
+sys.path.append(".")
+from gui.homecontent import ObjectDetection
 
 if __name__ == "__main__":
     # Instantiate the ObjectDetection class

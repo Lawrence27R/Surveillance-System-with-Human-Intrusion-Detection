@@ -1,6 +1,5 @@
-import threading
-import time
 import cv2
+import time
 import numpy as np
 import os
 import torch
@@ -11,8 +10,8 @@ from driver_code.face_detection.scrfd.detector import SCRFD
 from driver_code.face_recognitions.arcface.model import iresnet_inference
 from driver_code.face_recognitions.arcface.utils import compare_encodings, read_features
 from driver_code.face_tracking.tracker.byte_tracker import BYTETracker
-from driver_code.face_tracking.tracker.visualize import plot_tracking    
-from gui.logs import LogsHandler  
+from driver_code.face_tracking.tracker.visualize import plot_tracking
+from gui.logs import LogsHandler
 
 class FaceRecognizer:
     def __init__(self):
@@ -59,7 +58,8 @@ class FaceRecognizer:
                     tracking_ids.append(tid)
                     tracking_scores.append(t.score)
 
-            tracking_image = plot_tracking(img_info["raw_img"], tracking_tlwhs, tracking_ids, names=self.id_face_mapping, frame_id=frame_id + 1, fps=fps)
+            tracking_image = plot_tracking(img_info["raw_img"], tracking_tlwhs, tracking_ids,
+                                           names=self.id_face_mapping, frame_id=frame_id + 1, fps=fps)
         else:
             tracking_image = img_info["raw_img"]
 
@@ -104,7 +104,7 @@ class FaceRecognizer:
         union_area = area_box1 + area_box2 - intersection_area
         iou = intersection_area / union_area
         return iou
-    
+
     def destroy_window(self):
         # Set the exit flag for the threads
         self.exit_threads = True
@@ -115,7 +115,7 @@ class FaceRecognizer:
         frame_count, fps = 0, 0
         tracker = BYTETracker(args=args, frame_rate=30)
         frame_id = 0
-        
+
         if addr == "Select Camera":
             self.cap = cv2.VideoCapture(0)
         else:
@@ -138,7 +138,6 @@ class FaceRecognizer:
                 if ch == 27 or ch == ord("q") or ch == ord("Q") or self.exit_threads:
                     break
 
-                # Recognition logic within the tracking loop
                 self.process_recognition()
 
         finally:
@@ -183,3 +182,4 @@ class FaceRecognizer:
 
         # Add any cleanup logic here if needed
         self.exit_threads = True
+
