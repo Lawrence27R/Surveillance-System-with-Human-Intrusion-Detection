@@ -105,10 +105,6 @@ class FaceRecognizer:
         iou = intersection_area / union_area
         return iou
     
-    def destroy_window(self):
-        # Set the exit flag for the threads
-        self.exit_threads = True
-        cv2.destroyAllWindows()
 
     def tracking(self, detector, args, addr):
         start_time = time.time_ns()
@@ -180,6 +176,3 @@ class FaceRecognizer:
             print("Interrupt received. Stopping processing...")
             self.exit_threads = True
             self.logs_handler.stop_processing()
-
-        # Add any cleanup logic here if needed
-        self.exit_threads = True
