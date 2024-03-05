@@ -3,11 +3,12 @@ import cv2
 import os
 import pandas as pd
 from gui.email_alert import send_email, call
+import threading
+import queue
 
 class LogsHandler:
     def __init__(self, logs_folder=""):
         self.logs_folder = logs_folder
-        self.notified = False
         os.makedirs(self.logs_folder, exist_ok=True)
 
         # Create a new Excel file with today's date
@@ -20,6 +21,32 @@ class LogsHandler:
 
         # Read the Excel file into the DataFrame
         self.log_df = pd.read_excel(log_file_path)
+        self.stop_event = threading.Event()
+        self.log_queue = queue.Queue()
+
+    def process_log_queue(self):
+        while not self.stop_event.is_set():
+            try:
+                log_entry = self.log_queue.get(timeout=1)
+                if log_entry is None:
+                    break
+                name, time, date = log_entry
+                self.log_entry(name, time, date)
+            except queue.Empty:
+                continue
+            except Exception as e:
+                print(f"Error processing log queue: {e}")
+                import traceback
+                traceback.print_exc()
+        print("Exiting log processing loop.")
+
+    def start_log_processing_thread(self):
+        self.log_processing_thread = threading.Thread(target=self.process_log_queue)
+        self.log_processing_thread.start()
+
+    def stop_log_processing_thread(self):
+        self.log_queue.put(None)
+        self.log_processing_thread.join()
 
     def log_entry(self, name, time, date):
         try:
@@ -45,12 +72,19 @@ class LogsHandler:
 
             # Save the updated log file
             self.log_df.to_excel(log_file_path, index=False)
-            # print(f"Log entry added successfully: {log_file_path}")
 
         except Exception as e:
             print(f"Error while adding log entry: {e}")
             import traceback
             traceback.print_exc()
+
+    def email_alert(self, image_filename, object_detected):
+            # Implement your email alert logic here
+            send_email(image_filename, object_detected)
+
+    def call_alert(self):
+        # Implement your call alert logic here
+        call()
 
     def perform_alert(self, name, score, face_alignment):
         try:
@@ -59,29 +93,22 @@ class LogsHandler:
 
             caption = None
 
-            if 0.25 < score <= 0.50:
+            if 0.25 < score < 0.50:
                 caption = "INTRUDER"
-                self.log_entry(caption, current_time, current_date)
-
+                self.log_queue.put((caption, current_time, current_date))
                 image_filename = f"email_alert/alert_{current_time}.jpg"
-                if face_alignment is not None:
-                    cv2.imwrite(image_filename, face_alignment)
-                    if not self.notified:
-                        send_email(image_filename)
-                        print(f"Email sent: {current_time}")
+                cv2.imwrite(image_filename, face_alignment)
 
+                # Move alert processing to a separate thread
+                alert_thread = threading.Thread(target=self.process_alert, args=(image_filename, caption))
+                alert_thread.start()
             elif 0 < score < 0.25:
                 caption = "INTRUDER"
-                self.log_entry(caption, current_time, current_date)
-                if not self.notified:
-                    call()
-                    print(f"Call initiated: {current_time}")
-
+                self.log_queue.put((caption, current_time, current_date))
+                self.call_alert()
             else:
                 caption = f"{name}"
-                self.log_entry(caption, current_time, current_date)
-
-            self.notified = True
+                # self.log_queue.put((caption, current_time, current_date))
             return caption
 
         except Exception as e:
@@ -90,6 +117,9 @@ class LogsHandler:
             traceback.print_exc()
             return None
 
-    def stop_processing(self):
-        pass  # No threading, nothing to stop
+    def process_alert(self, image_filename, caption):
+        # Your actual alert processing logic (email, etc.) goes here
+        self.email_alert(image_filename, caption)
 
+    def stop_processing(self):
+        self.stop_log_processing_thread()
