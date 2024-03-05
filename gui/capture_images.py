@@ -23,24 +23,12 @@ def capture_images(user_id, username):
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         frontal_faces = face_cascade_frontal.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
-
         profile_faces = face_cascade_profile.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
 
-        for (x, y, width, height) in frontal_faces:
-            face_pixels = frame[y:y + height, x:x + width]
-            cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
-            cv2.imshow("Capture Images", frame)
+        # Combine results from both frontal and profile face detection
+        all_faces = list(frontal_faces) + list(profile_faces)
 
-            key = cv2.waitKey(1)
-            if key in (27, ord('q')):
-                break
-            elif key == 99 or key == 67:
-                img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
-                cv2.imwrite(img_file, face_pixels)
-                print(f"Image {image_number} captured and saved as {img_file}")
-                image_number += 1
-
-        for (x, y, width, height) in profile_faces:
+        for (x, y, width, height) in all_faces:
             face_pixels = frame[y:y + height, x:x + width]
             cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
             cv2.imshow("Capture Images", frame)

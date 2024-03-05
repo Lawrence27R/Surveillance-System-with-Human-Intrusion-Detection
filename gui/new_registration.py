@@ -268,10 +268,3 @@ class NewRegistrationSection(tk.Frame):
     def close_connection(self):
         self.cursor.close()
         self.conn.close()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = NewRegistrationSection(root)
-    root.bind("<q>", lambda event: root.destroy())
-    root.protocol("WM_DELETE_WINDOW", app.close_connection)
-    root.mainloop()
