@@ -23,6 +23,7 @@ class LogsHandler:
         self.log_df = pd.read_excel(log_file_path)
         self.stop_event = threading.Event()
         self.log_queue = queue.Queue()
+        self.processed_intruders = set()
 
     def process_log_queue(self):
         while not self.stop_event.is_set():
@@ -95,17 +96,21 @@ class LogsHandler:
 
             if 0.25 < score < 0.50:
                 caption = "INTRUDER"
-                self.log_queue.put((caption, current_time, current_date))
-                image_filename = f"email_alert/alert_{current_time}.jpg"
-                cv2.imwrite(image_filename, face_alignment)
+                if name not in self.processed_intruders:
+                    self.processed_intruders.add(name)
+                    self.log_queue.put((caption, current_time, current_date))
+                    image_filename = f"email_alert/alert_{current_time}.jpg"
+                    cv2.imwrite(image_filename, face_alignment)
 
-                # Move alert processing to a separate thread
-                alert_thread = threading.Thread(target=self.process_alert, args=(image_filename, caption))
-                alert_thread.start()
+                    # Move alert processing to a separate thread
+                    alert_thread = threading.Thread(target=self.process_alert, args=(image_filename, caption))
+                    alert_thread.start()
             elif 0 < score < 0.25:
                 caption = "INTRUDER"
-                self.log_queue.put((caption, current_time, current_date))
-                self.call_alert()
+                if name not in self.processed_intruders:
+                    self.processed_intruders.add(name)
+                    self.log_queue.put((caption, current_time, current_date))
+                    self.call_alert()
             else:
                 caption = f"{name}"
                 # self.log_queue.put((caption, current_time, current_date))
@@ -118,8 +123,12 @@ class LogsHandler:
             return None
 
     def process_alert(self, image_filename, caption):
-        # Your actual alert processing logic (email, etc.) goes here
-        self.email_alert(image_filename, caption)
+        try:
+            # Your actual alert processing logic (email, etc.) goes here
+            self.email_alert(image_filename, caption)
+        finally:
+            # Clear processed_intruders set after processing alerts
+            self.processed_intruders.clear()
 
     def stop_processing(self):
         self.stop_log_processing_thread()
