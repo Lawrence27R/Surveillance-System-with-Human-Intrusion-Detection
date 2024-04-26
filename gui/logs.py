@@ -81,6 +81,9 @@ class LogsHandler:
                     self.processed_intruders.add(name)
                     self.log_entry(caption, current_time, current_date)
                     self.call_alert()
+                    image_filename = f"email_alert/alert_{current_time}.jpg"
+                    cv2.imwrite(image_filename, face_alignment)
+                    self.email_alert(image_filename, caption)
 
             else:
                 caption = f"{name}"
