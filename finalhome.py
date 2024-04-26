@@ -56,7 +56,7 @@ class Homepage(tk.Frame):
         self.add_details_section = AddDetailsSection(self.main_content)
 
         # Home section
-        self.home_content = HomeContent(self.main_content, self.add_cctv_section)
+        self.home_content = HomeContent(self.main_content, self.add_cctv_section, self.intrusion_detector)
         self.current_section = None  # Initialize current_section to None
 
         self.show_section(self.home_content)  # Show home_content by default

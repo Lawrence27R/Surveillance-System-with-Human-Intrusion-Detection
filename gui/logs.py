@@ -3,8 +3,6 @@ import cv2
 import os
 import pandas as pd
 from gui.email_alert import send_email, call
-import threading
-import queue
 
 class LogsHandler:
     def __init__(self, logs_folder=""):
@@ -21,33 +19,7 @@ class LogsHandler:
 
         # Read the Excel file into the DataFrame
         self.log_df = pd.read_excel(log_file_path)
-        self.stop_event = threading.Event()
-        self.log_queue = queue.Queue()
         self.processed_intruders = set()
-
-    def process_log_queue(self):
-        while not self.stop_event.is_set():
-            try:
-                log_entry = self.log_queue.get(timeout=1)
-                if log_entry is None:
-                    break
-                name, time, date = log_entry
-                self.log_entry(name, time, date)
-            except queue.Empty:
-                continue
-            except Exception as e:
-                print(f"Error processing log queue: {e}")
-                import traceback
-                traceback.print_exc()
-        print("Exiting log processing loop.")
-
-    def start_log_processing_thread(self):
-        self.log_processing_thread = threading.Thread(target=self.process_log_queue)
-        self.log_processing_thread.start()
-
-    def stop_log_processing_thread(self):
-        self.log_queue.put(None)
-        self.log_processing_thread.join()
 
     def log_entry(self, name, time, date):
         try:
@@ -69,7 +41,7 @@ class LogsHandler:
             else:
                 # Add a new entry
                 new_entry = {"Name": name, "Time": time}
-                self.log_df = self.log_df.append(new_entry, ignore_index=True)
+                self.log_df = self.log_df._append(new_entry, ignore_index=True)
 
             # Save the updated log file
             self.log_df.to_excel(log_file_path, index=False)
@@ -80,8 +52,8 @@ class LogsHandler:
             traceback.print_exc()
 
     def email_alert(self, image_filename, object_detected):
-            # Implement your email alert logic here
-            send_email(image_filename, object_detected)
+        # Implement your email alert logic here
+        send_email(image_filename, object_detected)
 
     def call_alert(self):
         # Implement your call alert logic here
@@ -98,22 +70,22 @@ class LogsHandler:
                 caption = "INTRUDER"
                 if name not in self.processed_intruders:
                     self.processed_intruders.add(name)
-                    self.log_queue.put((caption, current_time, current_date))
+                    self.log_entry(caption, current_time, current_date)
                     image_filename = f"email_alert/alert_{current_time}.jpg"
                     cv2.imwrite(image_filename, face_alignment)
+                    self.email_alert(image_filename, caption)
 
-                    # Move alert processing to a separate thread
-                    alert_thread = threading.Thread(target=self.process_alert, args=(image_filename, caption))
-                    alert_thread.start()
             elif 0 < score < 0.25:
                 caption = "INTRUDER"
                 if name not in self.processed_intruders:
                     self.processed_intruders.add(name)
-                    self.log_queue.put((caption, current_time, current_date))
+                    self.log_entry(caption, current_time, current_date)
                     self.call_alert()
+
             else:
                 caption = f"{name}"
-                # self.log_queue.put((caption, current_time, current_date))
+                self.log_entry(caption, current_time, current_date)
+
             return caption
 
         except Exception as e:
@@ -122,13 +94,5 @@ class LogsHandler:
             traceback.print_exc()
             return None
 
-    def process_alert(self, image_filename, caption):
-        try:
-            # Your actual alert processing logic (email, etc.) goes here
-            self.email_alert(image_filename, caption)
-        finally:
-            # Clear processed_intruders set after processing alerts
-            self.processed_intruders.clear()
-
     def stop_processing(self):
-        self.stop_log_processing_thread()
+        pass
