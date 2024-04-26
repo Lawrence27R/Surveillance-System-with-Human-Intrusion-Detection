@@ -101,7 +101,7 @@ class NewRegistrationSection(tk.Frame):
     
     def add_person_button_clicked(self):
         # Call the add_persons function here
-        backup_dir = "datasets/backup"
+        backup_dir = "datasets/backup/"
         add_persons_dir = "datasets/new_persons/"
         faces_save_dir = "datasets/data/"
         features_path = "datasets/face_features/feature"
@@ -115,7 +115,7 @@ class NewRegistrationSection(tk.Frame):
         if not user_id or not username:
             messagebox.showwarning("Incomplete Information", "Please enter User ID and Username.")
             return
-        # capture_images(user_id, username)
+
         user_image_dir = os.path.join('datasets/new_persons/', f"{user_id}_{username}")
         os.makedirs(user_image_dir, exist_ok=True)
 
@@ -135,36 +135,37 @@ class NewRegistrationSection(tk.Frame):
             gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             frontal_faces = face_cascade_frontal.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
-
             profile_faces = face_cascade_profile.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
 
             for (x, y, width, height) in frontal_faces:
                 face_pixels = frame[y:y + height, x:x + width]
-                cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
-                cv2.imshow("Capture Images", frame)
+                if not face_pixels.size == 0:
+                    cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+                    cv2.imshow("Capture Images", frame)
 
-                key = cv2.waitKey(1)
-                if key in (27, ord('q')):
-                    break
-                elif key == 99 or key == 67:
-                    img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
-                    cv2.imwrite(img_file, face_pixels)
-                    print(f"Image {image_number} captured and saved as {img_file}")
-                    image_number += 1
+                    key = cv2.waitKey(1)
+                    if key in (27, ord('q')):
+                        break
+                    elif key == 99 or key == 67:
+                        img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
+                        cv2.imwrite(img_file, face_pixels)
+                        print(f"Image {image_number} captured and saved as {img_file}")
+                        image_number += 1
 
             for (x, y, width, height) in profile_faces:
                 face_pixels = frame[y:y + height, x:x + width]
-                cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
-                cv2.imshow("Capture Images", frame)
+                if not face_pixels.size == 0:
+                    cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+                    cv2.imshow("Capture Images", frame)
 
-                key = cv2.waitKey(1)
-                if key in (27, ord('q')):
-                    break
-                elif key == 99 or key == 67:
-                    img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
-                    cv2.imwrite(img_file, face_pixels)
-                    print(f"Image {image_number} captured and saved as {img_file}")
-                    image_number += 1
+                    key = cv2.waitKey(1)
+                    if key in (27, ord('q')):
+                        break
+                    elif key == 99 or key == 67:
+                        img_file = os.path.join(user_image_dir, f"{username}_{image_number}.jpg")
+                        cv2.imwrite(img_file, face_pixels)
+                        print(f"Image {image_number} captured and saved as {img_file}")
+                        image_number += 1
 
             cv2.imshow("Capture Images", frame)
 
@@ -267,10 +268,3 @@ class NewRegistrationSection(tk.Frame):
     def close_connection(self):
         self.cursor.close()
         self.conn.close()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = NewRegistrationSection(root)
-    root.bind("<q>", lambda event: root.destroy())
-    root.protocol("WM_DELETE_WINDOW", app.close_connection)
-    root.mainloop()

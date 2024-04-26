@@ -61,4 +61,3 @@ class DatabaseHandler:
     def close_connection(self):
         self.cursor.close()
         self.conn.close()
-

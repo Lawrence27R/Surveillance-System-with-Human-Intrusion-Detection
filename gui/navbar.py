@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Label, Menu
+from tkinter import Label, Menu, Toplevel
 from PIL import Image, ImageTk
 
 class NavigationBar(tk.Frame):
@@ -34,17 +34,29 @@ class NavigationBar(tk.Frame):
 
         about_us_label = tk.Label(self, text="About Us", font=('Century Gothic', 12), bg="#21252b", fg="white")
         about_us_label.pack(side=tk.RIGHT, padx=0)
+        about_us_label.bind("<Button-1>", self.show_about_us)
 
         about_project_label = tk.Label(self, text="About Project", font=('Century Gothic', 12), bg="#21252b", fg="white")
         about_project_label.pack(side=tk.RIGHT, padx=0)
+        about_project_label.bind("<Button-1>", self.show_about_project)
 
         self.pack(fill=tk.X, side=tk.TOP)
 
         cctv_logo_label.pack(side=tk.LEFT, padx=6)
         self.username_label.pack(side=tk.LEFT, expand=True, padx=0)
         account_label.pack(side=tk.RIGHT, padx=12)
-        about_us_label.pack(side=tk.RIGHT, padx=20)
-        about_project_label.pack(side=tk.RIGHT, padx=20)
+
+    def show_about_project(self, event):
+        about_project_window = Toplevel(self.master.master)
+        about_project_window.title("About Project")
+        about_project_label = tk.Label(about_project_window, text="Information about the project goes here.")
+        about_project_label.pack(padx=20, pady=20)
+
+    def show_about_us(self, event):
+        about_us_window = Toplevel(self.master.master)
+        about_us_window.title("About Us")
+        about_us_label = tk.Label(about_us_window, text="Information about us goes here.")
+        about_us_label.pack(padx=20, pady=20)
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*.xlsx
 *.pt
 # C extensions
 *.so
@@ -28,3 +29,4 @@ driver_code/face_detection/scrfd/weights
 driver_code/face_detection/yolov5_face/weights
 driver_code/face_recognitions/arcface/weights
 driver_code/face_tracking/pretrained
+Video_Rec/

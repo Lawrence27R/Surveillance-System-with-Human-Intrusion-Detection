@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedStyle
-from mysql_db import initialize_connection, login
-from home import Homepage
+from mysql_db import DatabaseHandler
+import sys 
 from forgot_password import ForgotPasswordWindow
 
-conn, cursor = initialize_connection()
+sys.path.append(".")
+from home import Homepage
+
 
 class LoginWindow(tk.Frame):
     def __init__(self, master):
@@ -14,7 +16,9 @@ class LoginWindow(tk.Frame):
         self.master.title("Surveillance System with Human Intrusion Detection")
         self.master.geometry("1400x720+80+100")
         self.master.withdraw()
+        self.db = DatabaseHandler()
 
+        self.conn, self.cursor = self.db.initialize_connection()  
         style = ThemedStyle(self.master)
         style.set_theme("arc")
 
@@ -80,7 +84,7 @@ class LoginWindow(tk.Frame):
         data["email"] = self.entry1.get()
         data["password"] = self.entry2.get()
 
-        if login(cursor, data):
+        if self.db.login(data):
             print("Successful Login")
             self.destroy_current_window()
             self.show_homepage()
