@@ -1,16 +1,17 @@
 import mysql.connector
+import os
 
 class DatabaseHandler:
     def __init__(self):
         self.conn, self.cursor = self.initialize_connection()
 
     def initialize_connection(self):
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="users"
-        )
+    conn = mysql.connector.connect(
+        host=os.environ.get("DB_HOST", "localhost"),
+        user=os.environ.get("DB_USER", "root"),
+        password=os.environ.get("DB_PASSWORD", ""),
+        database=os.environ.get("DB_NAME", "users")
+    )
 
         cursor = conn.cursor()
         self.create_table(cursor)
@@ -53,8 +54,10 @@ class DatabaseHandler:
 
 
     def login(self, data):
-        self.cursor.execute(f"""SELECT * FROM users WHERE email = '{data["email"]}' 
-                           AND password = '{data["password"]}' """)
+        self.cursor.execute(
+            "SELECT * FROM users WHERE email = %s AND password = %s",
+            (data["email"], data["password"])
+        )
 
         return self.cursor.fetchone() is not None
 
